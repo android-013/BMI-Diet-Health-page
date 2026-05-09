@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PulseFit Planner — BMI & Fitness Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora aurora-one"></div>
+  <div class="aurora aurora-two"></div>
+  <div class="grid-overlay"></div>
+
+  <main class="app-shell">
+    <header class="hero panel reveal">
+      <nav class="topbar">
+        <div class="brand">
+          <span class="brand-mark">PF</span>
+          <div>
+            <p class="eyebrow">Frontend-only fitness planner</p>
+            <h1>PulseFit Planner</h1>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="ghost-btn" id="exportBtn" type="button">Export JSON</button>
+          <button class="danger-btn" id="resetBtn" type="button">Reset</button>
+        </div>
+      </nav>
+
+      <section class="hero-grid">
+        <div class="hero-copy">
+          <p class="pill">BMI • Calories • Workouts • Habits</p>
+          <h2>Turn body data into a clean daily fitness plan.</h2>
+          <p class="hero-text">Calculate BMI, estimate calories, track meals and workouts, generate routines, and save daily progress locally in your browser.</p>
+          <div class="hero-buttons">
+            <a href="#profilePanel" class="primary-btn">Start planning</a>
+            <a href="#trackerPanel" class="secondary-btn">Track today</a>
+          </div>
+        </div>
+        <div class="hero-card glass-card">
+          <div class="orbital-ring"></div>
+          <div class="score-circle" id="heroScoreCircle">
+            <span id="heroBMI">--</span>
+            <small>BMI Score</small>
+          </div>
+          <div class="mini-stat-row">
+            <span>Goal calories</span>
+            <strong id="heroCalories">-- kcal</strong>
+          </div>
+          <div class="mini-stat-row">
+            <span>Workout streak</span>
+            <strong id="heroStreak">0 days</strong>
+          </div>
+        </div>
+      </section>
+    </header>
+
+    <section class="dashboard-grid">
+      <aside class="panel form-panel reveal" id="profilePanel">
+        <div class="section-heading">
+          <p class="eyebrow">Profile setup</p>
+          <h3>Your body & goal</h3>
+        </div>
+
+        <form id="profileForm" class="profile-form">
+          <label>
+            <span>Name</span>
+            <input type="text" id="name" placeholder="Sakib" autocomplete="name" />
+          </label>
+
+          <div class="field-grid">
+            <label>
+              <span>Age</span>
+              <input type="number" id="age" min="13" max="100" placeholder="24" />
+            </label>
+            <label>
+              <span>Gender</span>
+              <select id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="unit-toggle" role="group" aria-label="Unit selector">
+            <button type="button" class="unit-btn active" data-unit="metric">Metric</button>
+            <button type="button" class="unit-btn" data-unit="imperial">Imperial</button>
+          </div>
+
+          <div class="field-grid metric-fields">
+            <label>
+              <span>Height</span>
+              <div class="input-suffix"><input type="number" id="heightCm" min="90" max="250" placeholder="170" /><em>cm</em></div>
+            </label>
+            <label>
+              <span>Weight</span>
+              <div class="input-suffix"><input type="number" id="weightKg" min="25" max="300" placeholder="70" /><em>kg</em></div>
+            </label>
+          </div>
+
+          <div class="field-grid imperial-fields hidden">
+            <label>
+              <span>Height</span>
+              <div class="split-inputs">
+                <div class="input-suffix"><input type="number" id="heightFt" min="3" max="8" placeholder="5" /><em>ft</em></div>
+                <div class="input-suffix"><input type="number" id="heightIn" min="0" max="11" placeholder="8" /><em>in</em></div>
+              </div>
+            </label>
+            <label>
+              <span>Weight</span>
+              <div class="input-suffix"><input type="number" id="weightLb" min="55" max="660" placeholder="154" /><em>lb</em></div>
+            </label>
+          </div>
+
+          <label>
+            <span>Activity level</span>
+            <select id="activity">
+              <option value="1.2">Sedentary — little exercise</option>
+              <option value="1.375">Light — 1–3 days/week</option>
+              <option value="1.55" selected>Moderate — 3–5 days/week</option>
+              <option value="1.725">Very active — 6–7 days/week</option>
+              <option value="1.9">Athlete — intense training</option>
+            </select>
+          </label>
+
+          <div class="field-grid">
+            <label>
+              <span>Goal</span>
+              <select id="goal">
+                <option value="lose">Lose fat</option>
+                <option value="maintain" selected>Maintain</option>
+                <option value="gain">Gain muscle</option>
+              </select>
+            </label>
+            <label>
+              <span>Target weight</span>
+              <div class="input-suffix"><input type="number" id="targetWeight" min="25" max="300" placeholder="68" /><em id="targetUnit">kg</em></div>
+            </label>
+          </div>
+
+          <label>
+            <span>Training focus</span>
+            <select id="focus">
+              <option value="balanced">Balanced fitness</option>
+              <option value="fat-loss">Fat loss</option>
+              <option value="strength">Strength</option>
+              <option value="muscle">Muscle gain</option>
+              <option value="mobility">Mobility & recovery</option>
+            </select>
+          </label>
+
+          <button class="primary-btn full" type="submit">Calculate my plan</button>
+        </form>
+      </aside>
+
+      <section class="main-stack">
+        <section class="metric-grid reveal">
+          <article class="metric-card glow-card">
+            <span class="metric-icon">⚖️</span>
+            <p>BMI</p>
+            <h3 id="bmiValue">--</h3>
+            <small id="bmiCategory">Add your profile</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-icon">🔥</span>
+            <p>BMR</p>
+            <h3 id="bmrValue">--</h3>
+            <small>Resting calories/day</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-icon">⚡</span>
+            <p>TDEE</p>
+            <h3 id="tdeeValue">--</h3>
+            <small>Estimated daily burn</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-icon">🎯</span>
+            <p>Daily Goal</p>
+            <h3 id="calorieGoalValue">--</h3>
+            <small id="goalLabel">Calories target</small>
+          </article>
+        </section>
+
+        <section class="panel reveal">
+          <div class="section-heading row-heading">
+            <div>
+              <p class="eyebrow">Today overview</p>
+              <h3 id="welcomeTitle">Your daily dashboard</h3>
+            </div>
+            <span class="date-chip" id="todayDate"></span>
+          </div>
+
+          <div class="progress-layout">
+            <div class="ring-card">
+              <div class="progress-ring" id="calorieRing" style="--progress: 0">
+                <span id="calorieLeft">--</span>
+                <small>kcal left</small>
+              </div>
+              <p id="dailySummary">Complete profile to unlock tracking.</p>
+            </div>
+
+            <div class="macro-card">
+              <div class="macro-row">
+                <span>Protein</span>
+                <strong id="proteinTarget">--g</strong>
+                <div class="bar"><i id="proteinBar"></i></div>
+              </div>
+              <div class="macro-row">
+                <span>Carbs</span>
+                <strong id="carbTarget">--g</strong>
+                <div class="bar"><i id="carbBar"></i></div>
+              </div>
+              <div class="macro-row">
+                <span>Fat</span>
+                <strong id="fatTarget">--g</strong>
+                <div class="bar"><i id="fatBar"></i></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel reveal" id="trackerPanel">
+          <div class="section-heading row-heading">
+            <div>
+              <p class="eyebrow">Daily tracker</p>
+              <h3>Meals, workouts & habits</h3>
+            </div>
+            <button class="ghost-btn" id="saveDayBtn" type="button">Save day</button>
+          </div>
+
+          <div class="tracker-grid">
+            <form class="mini-form" id="mealForm">
+              <h4>Add meal</h4>
+              <input type="text" id="mealName" placeholder="Meal name" />
+              <div class="field-grid tiny">
+                <input type="number" id="mealCalories" placeholder="kcal" min="0" />
+                <input type="number" id="mealProtein" placeholder="protein g" min="0" />
+                <input type="number" id="mealCarbs" placeholder="carbs g" min="0" />
+                <input type="number" id="mealFat" placeholder="fat g" min="0" />
+              </div>
+              <button type="submit" class="secondary-btn full">Add meal</button>
+            </form>
+
+            <form class="mini-form" id="workoutForm">
+              <h4>Add workout</h4>
+              <input type="text" id="workoutName" placeholder="Workout name" />
+              <div class="field-grid tiny">
+                <input type="number" id="workoutMinutes" placeholder="minutes" min="0" />
+                <input type="number" id="workoutCalories" placeholder="burn kcal" min="0" />
+              </div>
+              <button type="submit" class="secondary-btn full">Add workout</button>
+            </form>
+
+            <form class="mini-form" id="habitForm">
+              <h4>Habits</h4>
+              <div class="field-grid tiny">
+                <input type="number" id="water" placeholder="water glasses" min="0" />
+                <input type="number" id="steps" placeholder="steps" min="0" />
+              </div>
+              <div class="toggle-line">
+                <label><input type="checkbox" id="sleepCheck" /> 7h sleep</label>
+                <label><input type="checkbox" id="stretchCheck" /> Stretching</label>
+              </div>
+              <button type="submit" class="secondary-btn full">Update habits</button>
+            </form>
+          </div>
+
+          <div class="log-grid">
+            <div class="log-card">
+              <h4>Meal log</h4>
+              <ul id="mealList" class="entry-list empty-list"><li>No meals added yet.</li></ul>
+            </div>
+            <div class="log-card">
+              <h4>Workout log</h4>
+              <ul id="workoutList" class="entry-list empty-list"><li>No workouts added yet.</li></ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="section-heading row-heading">
+            <div>
+              <p class="eyebrow">Routine generator</p>
+              <h3>Workout plan</h3>
+            </div>
+            <button class="ghost-btn" id="generateRoutineBtn" type="button">Regenerate</button>
+          </div>
+          <div class="routine-grid" id="routineGrid"></div>
+        </section>
+
+        <section class="panel reveal">
+          <div class="section-heading row-heading">
+            <div>
+              <p class="eyebrow">Progress insights</p>
+              <h3>7-day snapshot</h3>
+            </div>
+            <button class="ghost-btn" id="demoDataBtn" type="button">Load demo</button>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="progressChart" width="900" height="320" aria-label="Seven day calorie progress chart"></canvas>
+          </div>
+          <div class="insight-box" id="insightBox">Save a few days to see trend insights here.</div>
+        </section>
+      </section>
+    </section>
+
+    <footer class="footer-note reveal">
+      <strong>Note:</strong> This app is for general planning only. BMI is a screening number, not a medical diagnosis. For health conditions, eating disorders, pregnancy, or intense weight changes, ask a qualified professional.
+    </footer>
+  </main>
+
+  <template id="entryTemplate">
+    <li>
+      <div>
+        <strong></strong>
+        <small></small>
+      </div>
+      <button type="button" aria-label="Delete entry">×</button>
+    </li>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
